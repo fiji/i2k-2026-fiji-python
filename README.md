@@ -1,6 +1,8 @@
 # Fiji + Python Workshop Slides
 
-Interactive slides for the BINA × I2K 2026 Fiji + Python workshop (forked from the [I2K 2025 Appose workshop](https://github.com/fiji/i2k-2025-appose)), built with [Slidev](https://sli.dev/).
+Interactive slides for the I2K×BINA 2026 Fiji + Python workshop, built with [Slidev](https://sli.dev/).
+
+Evolved from [the "Halfway to I2K" 2025 Appose workshop](https://github.com/fiji/i2k-2025-appose).
 
 ## Prerequisites
 
@@ -137,12 +139,7 @@ When running locally, press `?` to see keyboard shortcuts, or click the presente
 
 This repository is configured to automatically deploy to GitHub Pages via GitHub Actions whenever you push to the `main` branch.
 
-The slides will be available at: `https://[username].github.io/[repo-name]/`
-
-To enable GitHub Pages:
-1. Go to repository Settings > Pages
-2. Set Source to "GitHub Actions"
-3. Push to main branch - deployment happens automatically
+The slides are available at: `https://fiji.github.io/i2k-2026-fiji-python/`
 
 ### Manual Deployment
 
