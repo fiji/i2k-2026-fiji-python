@@ -1,6 +1,6 @@
-# Appose Workshop Slides
+# Fiji + Python Workshop Slides
 
-Interactive slides for the I2K 2025 Appose workshop, built with [Slidev](https://sli.dev/).
+Interactive slides for the BINA × I2K 2026 Fiji + Python workshop (forked from the [I2K 2025 Appose workshop](https://github.com/fiji/i2k-2025-appose)), built with [Slidev](https://sli.dev/).
 
 ## Prerequisites
 

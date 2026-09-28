@@ -4,7 +4,7 @@
 
 set -e
 
-echo "🎬 Starting Appose Workshop Slides..."
+echo "🎬 Starting Fiji + Python Workshop Slides..."
 
 # Check if nvm is available
 if command -v nvm &> /dev/null; then

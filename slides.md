@@ -1,12 +1,13 @@
 ---
 theme: the-unnamed
 background: https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072
-title: Appose Workshop
+title: Fiji and Python
 info: |
-  ## Appose: Interprocess Cooperation with Shared Memory
-  I2K 2025 Workshop
+  ## Fiji and Python: Scripting, Environments, and Deep Learning Integration
+  BINA × I2K 2026 Workshop
 
-  Teaching participants how to use Appose with Fiji for Python integration
+  From ad hoc Python calls to platform-agnostic ops:
+  Python mode, Appose, appose-python scripts, and scikit-ops.
 class: text-center
 drawings:
   persist: false
@@ -15,12 +16,12 @@ mdc: true
 duration: 120min
 ---
 
-# Appose Workshop
+# Fiji and Python
 
-## Interprocess Cooperation with Shared Memory
+## Scripting, Environments, and Deep Learning Integration
 
 Curtis Rueden @ UW-Madison LOCI  
-"Halfway to I2K" 2025
+BINA × I2K 2026
 
 <div class="pt-12">
   <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10" style="font-size: 2em">
@@ -30,384 +31,366 @@ Curtis Rueden @ UW-Madison LOCI
 
 <div class="pt-12 text-sm opacity-75">
 
-**SLIDES:** `https://fiji.github.io/i2k-2025-appose/`  
-**VIDEO:** https://youtu.be/9Rf4ynSDozc
+**SLIDES:** `https://fiji.github.io/i2k-2026-fiji-python/`
 
 </div>
+
+<!--
+AGENDA / TIMING (120 min):
+- 0:00–0:25  Five steps toward simplicity (talk)
+- 0:25–0:35  What's new in Appose
+- 0:35–0:50  Demos: Appose in the wild
+- 0:50–1:30  Hands-on: UNSEG as an appose-python script
+- 1:30–1:52  One more step: scikit-ops
+- 1:52–2:00  Which approach when? + Q&A
+-->
+
 ---
 layout: default
 ---
 
-# What is Appose?
+# Today's Plan
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+| | |
+|---|---|
+| **0:00** | Five steps toward simplicity |
+| **0:25** | What's new in Appose |
+| **0:35** | Demos: Appose in the wild |
+| **0:50** | 👩‍💻 Hands-on: a Python-powered Fiji script |
+| **1:30** | One more step: scikit-ops |
+| **1:52** | Which approach when? Q&A |
+
+</div>
+<div>
+
+<v-click>
+
+**To follow along with the hands-on:**
+- Fiji **Latest** (not Stable) from https://fiji.sc/
+- *Help › Update...* until fully up to date
+- [pixi](https://pixi.sh/latest/installation/) (recommended)
+- git (recommended)
+
+**Can follow along without coding&mdash;just watch!**
+
+</v-click>
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# The Problem
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+### Innovation happens in Python 🐍
+
+- Cellpose, StarDist, SAM, Trackastra, nnInteractive...
+- PyTorch, TensorFlow, JAX
+- New tools every week
+
+</div>
+<div>
+
+### Biologists work in Fiji 🔬
+
+- Established, familiar workflows
+- Point-and-click, macros, scripts
+- Huge plugin ecosystem
+
+</div>
+</div>
+
+<v-click>
+
+<div class="pt-8">
+
+### And every Python tool wants its *own* environment 😱
+
+```
+cellpose 3   → torch 2.x, numpy 2.x, python 3.10+
+stardist     → tensorflow <2.16, numpy <2, python 3.9–3.11
+UNSEG        → python 3.9, numpy 1.24.3, scikit-image 0.20.0
+```
+
+</div>
+
+</v-click>
+
+---
+layout: center
+class: text-center
+---
+
+# Five Steps Toward Simplicity
+
+How do we get Python into Fiji, and make it *easy*?
+
+---
+layout: default
+---
+
+# The Staircase
+
+<div class="text-sm">
+
+| | Approach | You write | Environment | Processes | Platform |
+|---|---|---|---|---|---|
+| <v-click at="1">**1**</v-click> | <v-click at="1">Call Python via `ProcessBuilder`</v-click> | <v-click at="1">Java + Python + glue</v-click> | <v-click at="1">*You* install it</v-click> | <v-click at="1">Two, via files</v-click> | <v-click at="1">Fiji</v-click> |
+| <v-click at="2">**2**</v-click> | <v-click at="2">**Python mode** (PyImageJ)</v-click> | <v-click at="2">Python script</v-click> | <v-click at="2">*You* pick one</v-click> | <v-click at="2">**One**, shared memory</v-click> | <v-click at="2">Fiji</v-click> |
+| <v-click at="3">**3**</v-click> | <v-click at="3">**Appose**-powered plugins</v-click> | <v-click at="3">Java + Python</v-click> | <v-click at="3">Built on demand</v-click> | <v-click at="3">Many, shared memory</v-click> | <v-click at="3">Fiji</v-click> |
+| <v-click at="4">**4**</v-click> | <v-click at="4">**appose-python** scripts</v-click> | <v-click at="4">Python script</v-click> | <v-click at="4">Built on demand</v-click> | <v-click at="4">Many, shared memory</v-click> | <v-click at="4">Fiji</v-click> |
+| <v-click at="5">**5**</v-click> | <v-click at="5">**scikit-ops**</v-click> | <v-click at="5">A Python *function*</v-click> | <v-click at="5">Built on demand</v-click> | <v-click at="5">Many, shared memory</v-click> | <v-click at="5">**Any**</v-click> |
+
+</div>
+
+<v-click at="6">
+
+<div class="pt-4">
+
+Each step asks **less** of the author, and **nothing** of the user. 🎯
+
+</div>
+
+</v-click>
+
+---
+layout: two-cols
+---
+
+# ① Do It Yourself
+
+Fiji has always been able to *launch* Python...
+
+```groovy
+#@ ImagePlus imp
+import ij.IJ
+
+// Save the image to disk.
+input = File.createTempFile("in", ".tif")
+IJ.saveAsTiff(imp, input.path)
+output = new File(input.parent, "out.tif")
+
+// Run Python in some environment... somewhere.
+pb = new ProcessBuilder(
+  "/home/me/miniforge3/envs/seg/bin/python",
+  "/home/me/scripts/segment.py",
+  input.path, output.path)
+pb.inheritIO()
+pb.start().waitFor()
+
+// Read the result back from disk.
+IJ.openImage(output.path).show()
+```
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+### Cons ❌
+- **User** must install Python + all dependencies
+- Hardcoded paths everywhere
+- Data copied through the filesystem
+- No progress, no cancelation, errors = exit codes
+- Doesn't travel to another computer
+
+### Pros ✅
+- Works! (Sort of.)
+- Environments are isolated 🤔
+
+</v-clicks>
+
+</div>
+
+---
+layout: two-cols
+---
+
+# ② Python Mode
+
+Real CPython *inside* Fiji's process
+
+Powered by **PyImageJ**, **scyjava** (JPype), and **Jaunch**
+
+*Edit › Options › Python...* → choose an environment → restart
+
+```python
+#@ ImageJ ij
+#@ Dataset image
+#@ double sigma
+#@output Dataset blurred
+
+from skimage.filters import gaussian
+
+arr = ij.py.from_java(image)  # no copy!
+blurred = ij.py.to_dataset(gaussian(arr, sigma))
+```
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+### Pros ✅
+- **Same process**: Java and Python share memory directly
+- Java objects wrapped as Python objects: full ImageJ API from Python
+- Interactive, low latency, no serialization
+
+### Cons ❌
+- **One environment** at a time, chosen by the user
+- Everything must coexist: Fiji's JVM + every Python library
+- A crash in native code takes down Fiji
+
+</v-clicks>
+
+</div>
+
+<!--
+Emphasize: this is not obsoleted by what follows. It's a different animal.
+We'll come back to "which one when" at the end.
+-->
+
+---
+layout: default
+---
+
+# ③ Appose
 
 ## "Interprocess cooperation with shared memory"
 
 <v-clicks>
 
-- 🔄 **Interprocess** - Multiple processes connected via communication protocol
+- 🔄 **Interprocess** - Multiple processes connected via a communication protocol
 - 🤝 **Cooperation** - Build environments, start services, run tasks
 - 💾 **Shared Memory** - Cross-platform, cross-language memory buffers
 
 </v-clicks>
 
----
-layout: default
----
-
-# What Appose is NOT
-
-## Appose ≠ Fiji's Python Mode
-
-**Python Mode:** Runs Python in the *same process* as Java
-- Powered by PyImageJ (imglyb, scyjava, jgo, jpype) and enabled by Jaunch
-
-<div class="grid grid-cols-2 gap-4 mt-4">
-
-<div>
-
 <v-click>
 
-### Pros ✅
-- Memory can be shared directly
-- Java objects wrapped as Python objects via JPype
-- Write true Python (CPython, not Jython) scripts in Fiji's Script Editor
+<div class="pt-6">
 
-</v-click>
+Java ↔ Python, Python ↔ Python, Java ↔ Groovy, ... **each tool in its own environment**, all at once.
 
-</div>
-<div>
-
-<v-click>
-
-### Cons ❌
-- Fiji can only run in Python mode with **one environment at a time**
-- No switching between deep learning tools with incompatible dependencies
-- All tools must share the same Python environment
-
-</v-click>
-
-</div>
-</div>
-
-<v-click>
-
-<div style="margin-top: -1em">
-
-### Appose solves this!
-Multiple isolated environments, each with their own dependencies, running simultaneously.
+Environments via **pixi**, **uv**, or **micromamba**&mdash;downloaded and built on demand.
+**User doesn't need to know any of them exist.**
 
 </div>
 
 </v-click>
 
----
-layout: default
----
+<div class="pt-6 text-sm opacity-75">
 
-# Interprocess
+https://apposed.org &nbsp;·&nbsp; Deep dive: [I2K 2025 Appose workshop](https://fiji.github.io/i2k-2025-appose/)
 
-Multiple **processes** (programs) connected via communication protocol
-
-<v-clicks>
-
-## Examples
-
-- Fiji (Java) → Python program
-- napari (Python) → Java program
-- Java ↔ Java
-- Python ↔ Python
-- Python ↔ R
-
-</v-clicks>
-
-::right::
-
-<v-clicks>
-
-### Pros ✅
-- Called program doesn't need to "know about" caller
-- Clean separation of concerns
-- Use best tool for each job
-
-### Cons ❌
-- Each process has own memory space
-- No direct memory sharing (traditionally)
-
-</v-clicks>
+</div>
 
 ---
 layout: default
 ---
 
-# Cooperation
+# Appose: Environment → Service → Task
 
-How Appose facilitates<br>interprocess cooperation:
+<div class="absolute right-10" style="top: 8rem; width: 22rem;">
 
-<div class="absolute top-10 right-10" style="width: 40rem;">
-
-```mermaid
+```mermaid {scale: 0.75}
 graph TD
     Env[Environment] -->|contains| S1[Service/Worker 1]
     Env -->|contains| S2[Service/Worker 2]
-    Env -->|contains| S3[Service/Worker ...]
     S1 -->|executes| T1[Task 1]
     S1 -->|executes| T2[Task 2]
-    S1 -->|executes| T3[Task ...]
-    S2 -->|executes| T4[Task 1]
-    S2 -->|executes| T5[Task 2]
+    S2 -->|executes| T3[Task 1]
 
     style Env fill:#4a9eff,stroke:#333,stroke-width:3px,color:#fff
     style S1 fill:#6bc95f,stroke:#333,stroke-width:2px,color:#fff
     style S2 fill:#6bc95f,stroke:#333,stroke-width:2px,color:#fff
-    style S3 fill:#6bc95f,stroke:#333,stroke-width:2px,color:#fff
     style T1 fill:#ffa726,stroke:#333,stroke-width:1px,color:#fff
     style T2 fill:#ffa726,stroke:#333,stroke-width:1px,color:#fff
     style T3 fill:#ffa726,stroke:#333,stroke-width:1px,color:#fff
-    style T4 fill:#ffa726,stroke:#333,stroke-width:1px,color:#fff
-    style T5 fill:#ffa726,stroke:#333,stroke-width:1px,color:#fff
 ```
 
 </div>
 
-<div class="grid grid-cols-2 gap-4">
-
-<div>
-
-<v-click>
-
-<br>
-
-1. **Build Environment**
-   - Using pixi, uv, or micromamba
-   - No pre-installation needed
-   - Everything downloaded on demand
-
-</v-click>
-<v-click>
-
-<br>
-
-2. **Start Service**
-   - Worker process running in that environment
-   - Stays alive for multiple tasks
-
-</v-click>
-<v-click>
-
-</v-click>
-
-</div>
-<div style="margin-top: 5rem">
-
-<v-click>
-
-3. **Run Tasks**
-   - Feed inputs, receive outputs
-   - Via JSON serialization
-   - Through the service/worker
-
-</v-click>
-
-</div>
-</div>
-
----
-layout: default
----
-
-# Shared Memory
-
-Cross-platform, cross-language support for named shared memory buffers
-
-<v-click>
-
-## Built into Python
-
-```python
-from multiprocessing.shared_memory import SharedMemory
-```
-
-</v-click>
-<v-click>
-
-## Appose Extension
-
-```python
-from appose import SharedMemory
-```
-
-</v-click>
-<v-click>
-
-## Java Implementation
+<div style="width: 55%">
 
 ```java
-import org.apposed.appose.SharedMemory;
+// 1. Build the environment (first time only).
+Environment env = Appose.file("pixi.toml")
+    .subscribeProgress((title, cur, max) -> ...)
+    .build();
+
+// 2. Start a worker process in it.
+try (Service python = env.python()) {
+
+    // 3. Run a task: inputs in, outputs out.
+    Map<String, Object> inputs = Map.of(
+        "image", ShmImg.copyOf(img).ndArray());
+    Task task = python.task(script, inputs)
+        .listen(e -> log(e.message))
+        .waitFor();
+
+    Img<?> labels = NDArrays.asArrayImg(
+        (NDArray) task.outputs.get("labels"));
+}
 ```
-New class modeled closely after Python's implementation
 
-**Result:** Efficient sharing of large data (images!) without serialization overhead
-
-</v-click>
+</div>
 
 ---
 layout: default
 ---
 
-# N-dimensional Arrays
+# Shared Memory: No Copying Big Images
 
-Shared memory with structural metadata (**images**!)
+`NDArray` = named `SharedMemory` block + dtype + shape
 
-`NDArray` = `SharedMemory` + dtype + shape
+<div class="grid grid-cols-2 gap-4 pt-4">
+<div>
 
-<div class="absolute top-10 right-10" style="z-index: 1">
-
-<v-click>
-
-## Python: NumPy-compatible
+### Python: NumPy-compatible
 
 ```python
 import appose
 
-# Create shared memory NDArray
 data = appose.NDArray("uint16", [2, 20, 25])
-
-# Access as NumPy array
-numpy_array = data.ndarray()
+arr = data.ndarray()  # numpy view, no copy
 ```
-
-</v-click>
-<v-click>
-
-**🤔 How does that work under the hood?**
-```python
-numpy.ndarray(
-    prod(data.shape), dtype=data.dtype, buffer=data.shm.buf
-).reshape(data.shape)
-```
-</v-click>
 
 </div>
+<div>
 
-<v-click>
-
-<div style="margin-top: 1.5rem">
-
-## Java: ImgLib2-compatible
+### Java: ImgLib2-compatible
 
 ```java
-import org.apposed.appose.NDArray;
-import net.imglib2.appose.*; // ShmImg, NDArrays
+import net.imglib2.appose.*;
 
-// Receive NDArray from Python (via task.outputs)
+// View an NDArray from Python as an Img.
 ShmImg<FloatType> img = new ShmImg<>(ndarray);
 
-// Or create and send to Python (as a task input)
-NDArray ndarray = NDArrays.ndArray(new FloatType(), 4, 3, 2);
-Img<FloatType> img = NDArrays.asArrayImg(ndarray, new FloatType());
-
-// Or copy to ShmImg from existing (presumably non-shm) Img
-Img<FloatType> sharedCopy = ShmImg.copyOf(someOtherImg);
-// See also net.imglib2.util.ImgUtil.copy(srcImg, destImg)
+// Or put an existing Img into shared memory.
+Img<FloatType> shared = ShmImg.copyOf(someImg);
 ```
 
 </div>
-
-</v-click>
-
----
-layout: center
-class: text-center
----
-
-# Live Demos
-
-Real-world Appose integrations in action
-
----
-layout: center
----
-
-# Demo 1: SAMJ
-
-<div style="position: absolute; right: 3rem; margin-top: -10rem; z-index: 1">
-
-<img src="/deepimagej_logo.png" style="width: 16rem">
-
 </div>
-
-One-click live segmentation
-
-- Segment Anything Model integration
-- Python AI model called from Java
-- Interactive segmentation UI
-
-https://github.com/segment-anything-models-java/SAMJ-IJ
-
-*Help › Update... › Manage Update Sites › SAMJ*
-
----
-layout: center
----
-
-# Demo 2: TrackMate
-
-<div style="position: absolute; right: 2rem; margin-top: -10rem; z-index: 1">
-
-<img src="/trackmate-logo.png" style="width: 16rem">
-
-</div>
-
-Deep learning spot detectors
-
-- v9-appose branch
-- Python-based detection in Java application
-- Real-time particle tracking
-
-https://github.com/trackmate-sc/TrackMate/tree/v9-appose  
-
-Run `fiji/plugin/trackmate/TrackMatePlugIn.java` in IDE
-
----
-layout: center
----
-
-# Demo 3: Mastodon
-
-<div style="position: absolute; right: 2rem; margin-top: -10rem; z-index: 1">
-
-<img src="/mastodon-logo.png" style="width: 12rem">
-
-</div>
-
-Large-scale tracking capabilities
-
-- Cell detection and tracking with Python deep learning models
-- Powered by Appose + Cellpose3 + TrackAstra
-- Proof-of-concept stage: best to use Linux
-
-https://github.com/mastodon-sc/mastodon-deep-lineage/
-
-*Help › Update... › Manage Update Sites › Mastodon* + *Mastodon-DeepLineage*
-
----
-layout: default
----
-
-# Mastodon Demo: Dataset
-
-Using TGMM mini example dataset
-
-**Download from:**  
-https://github.com/mastodon-sc/mastodon-example-data/tree/master/tgmm-mini
-
-**Files needed:**
-- `datasethdf5.h5` - Image data
-- `datasethdf5.xml` - BDV metadata
 
 <v-click>
 
-**Create new Mastodon project** based on these two files
+<div class="pt-6">
+
+**Result:** Both processes see *the same pixels*&mdash;only the metadata travels as JSON.
+
+</div>
 
 </v-click>
 
@@ -415,117 +398,539 @@ https://github.com/mastodon-sc/mastodon-example-data/tree/master/tgmm-mini
 layout: default
 ---
 
-# Mastodon Demo: Install Python Environments
+# In-Process vs. Interprocess: Complementary!
 
-Install the required Python environments via Appose
+<div class="text-sm">
 
-**Menu:** `Plugins › Tracking › Python environments for detectors/linkers`
+| | **Python mode** (in-process) | **Appose** (interprocess) |
+|---|---|---|
+| Environments | One, chosen by user | Many, isolated, built on demand |
+| Incompatible tools together | ❌ | ✅ |
+| Access to Java objects | ✅ Direct, full API | ⚠️ Via serialization or proxies |
+| Data sharing | ✅ Anything, zero-copy | ✅ Arrays zero-copy; rest as JSON |
+| Crash isolation | ❌ Crash takes down Fiji | ✅ Worker dies, Fiji lives |
+| Cancelation | ⚠️ Cooperative only | ✅ Cooperative, or kill the worker |
+| Startup cost | ✅ None after launch | ⚠️ Worker process start (+ first build) |
+| Best for | **Interactive** scripting against the ImageJ API | **Shipping** Python tools to users |
+
+</div>
+
+<v-click>
+
+<div class="pt-4">
+
+Python mode is **not obsolete**. It's a different animal: use the right one for the job. 🐘 ≠ 🐙
+
+</div>
+
+</v-click>
+
+---
+layout: two-cols
+---
+
+# ③ Appose, in Practice
+
+Appose-powered Fiji plugins, written in Java:
+
+- **SAMJ**: Segment Anything, one click
+- **TrackMate**: deep learning detectors
+- **Mastodon**: Cellpose + Trackastra
+- **Appose Playground** *(new!)*: Cellpose, DeXtrusion, nnInteractive, Big-FISH
+
+<v-click>
+
+<div class="pt-4">
+
+But look at what a plugin author writes:
+- Java code to build the env
+- Java code to marshal inputs/outputs
+- Java code to start/stop services
+- Python code adapted to Appose's `task`
+- ...*plus* the actual algorithm
+
+</div>
+
+</v-click>
+
+::right::
+
+<v-click>
+
+<div class="pl-8 pt-16">
+
+### Consolidating the boilerplate 🧹
+
+Since the Pasteur hackathon (Mar 2026), we're pulling the shared plumbing out of each plugin:
+
+- `imglib2-appose`: Img ↔ NDArray
+- Common environment building & progress UI
+- **appose-swing** *(coming soon)*: see what Appose is doing under the hood
+
+**But what if there were *no* Java at all?** 🤔
+
+</div>
+
+</v-click>
+
+<!--
+TODO: Update the appose-swing line depending on release status before the workshop.
+-->
+
+---
+layout: two-cols
+---
+
+# ④ appose-python Scripts
+
+Write **pure Python** in Fiji's Script Editor
+
+```python
+#!appose-python
+#@script(env="pixi.toml")
+
+#@ Img image
+#@ double sigma
+#@output Img blurred
+
+from scipy.ndimage import gaussian_filter
+
+print(f"Blurring image of shape {image.shape}")
+blurred = gaussian_filter(image, sigma)
+```
+
+<div class="pt-2 text-sm">
+
+Env file: `pixi.toml`, `environment.yml`,<br>`requirements.txt`, or `pyproject.toml`
+
+</div>
+
+::right::
+
+<div class="pl-8 pt-16">
 
 <v-clicks>
 
-- **Update/Install cellpose3** - Cell segmentation model
-- **Update/Install trackastra** - Deep learning-based tracking
-
-<div>
-
-<div style="position: absolute; left: 4rem; margin-top: 1em; z-index: 1">
-
-<img src="/sad-mac.webp" style="width:12rem">
-
-</div>
-
-<div style="margin-left: 14rem">
-
-```
-error    libmamba Could not solve for environment specs
-    The following packages are incompatible
-    └─ pytorch-cuda =* * is not installable because there are no viable options
-       ├─ pytorch-cuda 11.6 would require
-       │  └─ cuda =11.6 *, which does not exist (perhaps a missing channel);
-       ├─ pytorch-cuda 11.7 would require
-       │  └─ cuda =11.7 *, which does not exist (perhaps a missing channel);
-       └─ pytorch-cuda 11.8 would require
-          └─ cuda =11.8 *, which does not exist (perhaps a missing channel).
-critical libmamba Could not solve for environment specs
-[ERROR] Installation failed for cellpose3
-```
-
-</div>
-
-</div>
+- `#!appose-python` → CPython via Appose (not Jython!)
+- `#@script(env=...)` → Appose builds the env on first run, reuses it after
+- `#@` parameters → the usual Fiji dialog, macro recording, batch mode
+- Images arrive as **NumPy arrays** via shared memory
+- Output NumPy arrays go back to Fiji as images
+- `print` goes to the Script Editor console
+- Tracebacks point at **your** line numbers
 
 </v-clicks>
 
+<v-click>
+
+**Zero lines of Java.** 🎉
+
+</v-click>
+
+</div>
+
+---
+layout: two-cols
+---
+
+# ⑤ scikit-ops
+
+A standard, type-annotated Python **function** + one decorator
+
+```python
+from skop import op
+from skop.types import ImageData, LabelsData
+
+@op(env="skimage")
+def otsu(
+    image: ImageData,
+    invert: bool = False,
+) -> LabelsData:
+    """Threshold an image by Otsu's method."""
+    from skimage import filters, measure
+
+    t = filters.threshold_otsu(image)
+    mask = image <= t if invert else image > t
+    return measure.label(mask)
+```
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- **No platform** in the code: no Fiji, no napari
+- Types → GUI widgets; docstring → tooltips
+- `ImageData`, `LabelsData`, ... → *roles*: each front end shows them its own way
+- `env=` → named environment, built on demand, shared between ops
+
+</v-clicks>
+
+<v-click>
+
+### Run it anywhere, as is
+
+- **Directly**: `otsu(my_array)`
+- **Isolated**: `skop.Runner().run(otsu, image=a)`
+- **napari**: *Plugins › scikit-ops › Ops*
+- **Fiji**: *Plugins › scikit-ops › Threshold › Otsu*
+- **Icy**: planned
+
+</v-click>
+
+</div>
+
+<!--
+Started at the naPLari hackathon in Krakow, July 2026, with Brian Northan.
+TODO: Adjust Fiji bullet depending on skop-fiji release status.
+-->
+
 ---
 layout: default
 ---
 
-# Mastodon Demo: Detection with Cellpose3
+# The Staircase, Revisited
 
-**Menu:** `Plugins › Tracking › Detection › Cellpose3`
+<div class="grid grid-cols-5 gap-2 pt-8 text-center text-sm">
 
-<v-click>
+<div class="p-3 rounded" style="background: rgba(255,255,255,0.05); margin-top: 8rem">
 
-**Settings to adjust:**
+**1. DIY**<br>
+ProcessBuilder<br>
+*you do everything*
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| Estimated diameter | 25 | Cell size in pixels |
-| GPU usage | 1.0 | Use full GPU (if available) |
+</div>
+<div class="p-3 rounded" style="background: rgba(255,255,255,0.08); margin-top: 6rem">
 
-</v-click>
-<v-click>
+**2. Python mode**<br>
+one process<br>
+*one environment*
 
-**Run detection**
-- Takes 3-5 minutes on laptop, or less than 1 minute on workstation
-- Cellpose runs in Python via Appose, results sent back to Mastodon
+</div>
+<div class="p-3 rounded" style="background: rgba(255,255,255,0.11); margin-top: 4rem">
 
-</v-click>
+**3. Appose plugins**<br>
+many environments<br>
+*Java + Python*
 
----
-layout: default
----
+</div>
+<div class="p-3 rounded" style="background: rgba(255,255,255,0.14); margin-top: 2rem">
 
-# Mastodon Demo: Linking with TrackAstra
+**4. appose-python**<br>
+many environments<br>
+*pure Python script*
 
-**Menu:** `Plugins › Tracking › Linking › TrackAstra`
+</div>
+<div class="p-3 rounded" style="background: rgba(255,255,255,0.17)">
 
-<v-click>
+**5. scikit-ops**<br>
+many environments<br>
+*pure Python function,<br>any platform*
 
-**Settings:**
-- Leave default parameters
-- TrackAstra uses deep learning for tracking
+</div>
 
-</v-click>
-<v-click>
+</div>
 
-**Run linking:**
-- Links detected cells across timepoints
-- Creates complete cell lineage tracks
-- All computation happens in Python via Appose
+<div class="pt-8 text-center">
 
-</v-click>
-<v-click>
+Today's hands-on climbs from **③ → ④**, then peeks at **⑤**. 🧗
 
-**Platform note:** Tested on Linux and Windows. Detection works on both; linking works best on Linux.
-
-</v-click>
+</div>
 
 ---
 layout: center
 class: text-center
 ---
 
-# Hands-On Workshop
+# What's New in Appose
 
-**Build your own Appose-powered tool in Fiji**
+Since I2K 2025
 
-<div class="pt-4">
-Goal: Integrate UNSEG with Fiji via Appose
+---
+layout: default
+---
+
+# Releases
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+### appose-java
+
+| Version | Date |
+|---|---|
+| 0.10.0 | Feb 2026 |
+| 0.11.0 | Mar 2026 |
+| 0.12.0 | *Sep 2026* |
+
+</div>
+<div>
+
+### appose-python
+
+| Version | Date |
+|---|---|
+| 0.10.0 | Feb 2026 |
+| 0.11.0 | Mar 2026 |
+| 0.12.0 | Jul 2026 |
+
+</div>
+</div>
+
+<v-click>
+
+<div class="pt-6">
+
+**Java and Python APIs now aligned** method-for-method: learn one, you know the other.
+
+</div>
+
+</v-click>
+
+<!--
+TODO: Confirm appose-java 0.12.0 release date (required by scripting-appose-python).
+-->
+
+---
+layout: default
+---
+
+# Better Feedback While Building Environments
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-clicks>
+
+- **Real progress** from pixi installs, with real denominators
+- Phases: *Solving* → *Installing conda packages* → *Downloading/Installing PyPI packages* → *Done*
+- **Skips redundant rebuilds**: unchanged env = instant start
+- `APPOSE_ENVS_DIR` to put environments wherever you like
+- **Named pixi environments**: one `pixi.toml`, several envs (e.g. `cpu` / `cuda`)
+- Build from any source: `Appose.file(...)`, `.url(...)`, `.content(...)`, with format auto-detected
+
+</v-clicks>
+
+</div>
+<div>
+
+<v-click>
+
+```java
+Environment env = Appose.file("pixi.toml")
+    .subscribeProgress((title, cur, max) ->
+        status.showStatus(cur, max, title))
+    .subscribeOutput(System.out::print)
+    .subscribeError(System.err::print)
+    .build();
+
+// Pick a named pixi environment.
+Environment gpu = env.activate("cuda");
+```
+
+</v-click>
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# More Robust Tasks
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+### Execution & cancelation
+
+<v-clicks>
+
+- Interrupting the calling thread **shuts down** the worker cleanly
+- `Task.waitFor()` **throws** `TaskException` on failure: no silent errors
+- Fixed race conditions around worker thread death
+- Cleaner worker processes: stray conda/mamba activation variables stripped
+- Windows fixes: paths with parentheses, exec handling
+
+</v-clicks>
+
+</div>
+<div>
+
+### Beyond primitives
+
+<v-clicks>
+
+- **Automatic proxies** for non-serializable outputs: call methods on remote Python objects from Java
+- **Extensible encoding/decoding**: teach Appose your own types
+- Pass alternate arguments to the Python service
+
+</v-clicks>
+
+<v-click>
+
+```java
+WorkerObject model = (WorkerObject)
+    task.outputs.get("model");
+model.call("eval");
+```
+
+</v-click>
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# Coming Soon: appose-swing 👀
+
+Visual feedback for what Appose is doing under the hood
+
+<div class="grid grid-cols-2 gap-8 pt-4">
+<div>
+
+- Which environments exist, and their build status
+- Which workers are running, and their tasks
+- Live build & task progress
+- Reusable across Appose-based Fiji plugins
+
+</div>
+<div>
+
+<!-- TODO: screenshot of appose-swing -->
+
+<div class="p-8 rounded text-center opacity-50" style="border: 2px dashed currentColor">
+
+*screenshot / live demo*
+
+</div>
+
+</div>
+</div>
+
+<!--
+TODO: Update or drop this slide depending on appose-swing release status.
+Feature bullets are placeholders; replace with what actually ships.
+-->
+
+---
+layout: center
+class: text-center
+---
+
+# Demos: Appose in the Wild
+
+---
+layout: default
+---
+
+# Appose-Powered Fiji Plugins
+
+<div class="grid grid-cols-3 gap-6 pt-4">
+
+<div>
+
+<img src="/deepimagej_logo.png" style="height: 5rem">
+
+### SAMJ
+Segment Anything, one click
+
+*Manage Update Sites › SAMJ*
+
+</div>
+<div>
+
+<img src="/trackmate-logo.png" style="height: 5rem">
+
+### TrackMate
+Deep learning spot detectors
+
+[v9-appose branch](https://github.com/trackmate-sc/TrackMate/tree/v9-appose)
+
+</div>
+<div>
+
+<img src="/mastodon-logo.png" style="height: 5rem">
+
+### Mastodon
+Cellpose3 + Trackastra lineages
+
+*Manage Update Sites › Mastodon-DeepLineage*
+
+</div>
 </div>
 
 <div class="pt-8 text-sm opacity-75">
-⏱️ ~90 minutes
+
+Full demo walkthroughs: [I2K 2025 Appose workshop](https://fiji.github.io/i2k-2025-appose/)
+
+</div>
+
+<!--
+TODO: Check current TrackMate appose status (still v9-appose branch?).
+Keep this brief: ~5 min total. The abstract promises these.
+-->
+
+---
+layout: default
+---
+
+# New: Appose Playground 🎪
+
+Fruits of the **Appose hackathon at Institut Pasteur** (Mar 2026)
+
+*Help › Update... › Manage Update Sites › Appose-Playground*
+
+<div class="grid grid-cols-2 gap-6 pt-4">
+<div>
+
+### Fiji-Cellpose
+Cell/nuclei segmentation with Cellpose
+
+### DeXtrusion
+Detect cellular events in epithelia movies
+
+</div>
+<div>
+
+### nnInterAppose
+Semi-automatic 3D segmentation from manual prompts, with nnInteractive
+
+### Big-FISH
+smFISH spot detection
+
+</div>
+</div>
+
+<div class="pt-6 text-sm opacity-75">
+
+https://github.com/Image-Analysis-Hub#appose-playground
+
+</div>
+
+<!--
+TODO: Pick 1–2 of these for live demo; pre-build envs on the demo machine!
+TODO: Verify Big-FISH description (BigFish_Appose on update site, not yet listed on GitHub page).
+-->
+
+---
+layout: center
+class: text-center
+---
+
+# 👩‍💻 Hands-On 👨‍💻
+
+**UNSEG in Fiji, the 2026 way**
+
+<div class="pt-4">
+Goal: Integrate UNSEG with Fiji as an appose-python script
+</div>
+
+<div class="pt-8 text-sm opacity-75">
+⏱️ ~40 minutes
 </div>
 
 ---
@@ -534,115 +939,51 @@ layout: default
 
 # Workshop Overview
 
-## What we'll build:
+<div class="grid grid-cols-2 gap-8">
+<div>
 
-Fiji plugin (Groovy script) that calls UNSEG for nucleus/cell segmentation
+## What we'll build
+
+A Fiji command that runs **UNSEG** nucleus + cell segmentation
 
 **UNSEG:** Unsupervised segmentation of cells and their nuclei in tissue  
 https://github.com/uttamLab/UNSEG
 
-<v-clicks>
+<v-click>
 
-## What you'll learn:
+## Last year vs. this year
 
-- Setting up Python environments with pixi
-- Adapting Python code for Appose
-- Writing Fiji scripts that call Python
-- Debugging cross-language integration
+Same algorithm, same result:<br>**15 steps** of Python + Groovy + Appose API<br>→ **6 steps**, pure Python
 
-</v-clicks>
+</v-click>
 
----
-layout: default
----
-
-# Prerequisites
-
-**Required:**
-- Fiji installed
-
-**Recommended:**
-- bash terminal
-- pixi
-- git
-- vim (or your favorite text editor)
-- claude (or your favorite AI assistant)
-
-**Can follow along without coding&mdash;just watch!**
-
----
-layout: center
-class: text-center
----
-
-# 👩‍💻 Let's Code! 👨‍💻
-
-**Follow along or just watch**
-
-We'll go through all the steps together!
-
-💡 Stuck? Clone reference repo:
-```bash
-git clone https://github.com/ctrueden/unseg-fiji
-```
-
-Use tags to jump to any step:
-```bash
-git checkout step03
-```
-
-Or to view changes for a particular step:
-```bash
-git show step04
-```
-
----
-layout: default
----
-
-# Step 0: Initialize Project
+</div>
+<div>
 
 <v-click>
 
-Create a dedicated folder for this project:
+## Why UNSEG?
+
+- Pure CPU: no GPU, no multi-GB PyTorch download over conference Wi-Fi
+- *Very* particular environment: Python 3.9, numpy 1.24.3, scikit-image 0.20.0...
+- ...which would **never** coexist with a modern Fiji Python mode env
+
+</v-click>
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# Step 0: Set Up
+
+Create a project folder and get UNSEG:
 
 ```bash
 mkdir ~/Desktop/unseg-fiji
 cd ~/Desktop/unseg-fiji
-```
-
-</v-click>
-<v-click>
-
-Initialize an empty pixi project skeleton:
-
-```
-pixi init
-```
-
-**💡 Install pixi from: https://pixi.sh/latest/installation/**
-
-</v-click>
-<v-click>
-
-**This creates `pixi.toml`**: the environment specification
-
-</v-click>
-<v-click>
-
-**🎯 Checkpoint:** `git init && git add . && git commit -m 'Add initial project skeleton'`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 1: Clone UNSEG
-
-Get the UNSEG repository from GitHub:
-
-```bash
 git clone https://github.com/uttamLab/UNSEG
 cp UNSEG/unseg.py .
 unzip UNSEG/image.zip
@@ -651,530 +992,329 @@ unzip UNSEG/image.zip
 <v-click>
 
 **What's in here?**
-- `unseg.py` - The segmentation algorithm
-- `run_unseg.ipynb` - Jupyter notebook showing how to use it
-- `requirements.txt` - Python dependencies
-- `image.zip` - Sample image data
+- `unseg.py` - The segmentation algorithm (a library of functions)
+- `image/Gallbladder_Normal_Tissue.tif` - Sample image data
 
 </v-click>
 
 <v-click>
 
-**🎯 Checkpoint:** `git add unseg.py && git commit -m 'Add unseg script'`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 2: Create Test Script
-
-Extract code from the Jupyter notebook into a Python script:
-
-**Manual approach:**
-1. Go to https://github.com/uttamLab/UNSEG in browser
-2. Click into `run_unseg.ipynb`
-3. Copy code blocks into text editor
-4. Save as `run.py`
-
-<v-click>
-
-**Or use your AI assistant!** 🤖
+Open the sample image in Fiji: *File › Open...*
 
 </v-click>
 
 <v-click>
 
-**🎯 Checkpoint:** `git add run.py && git commit -m 'Add test script'`
+💡 Stuck at any point? Reference solution: https://github.com/ctrueden/unseg-fiji (branch `2026`)
 
 </v-click>
 
----
-layout: default
----
-
-# Step 3: Import Dependencies
-
-<v-click>
-
-Import dependencies into pixi project:
-
-```bash
-pixi import UNSEG/requirements.txt --format pypi-txt --environment default
-```
-
-</v-click>
-
-<v-click>
-
-**This updates `pixi.toml`** environment specification.
-
-</v-click>
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -a -m 'Add unseg dependencies from requirements.txt'`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 4: Adjust Dependencies
-
-<v-click>
-
-**1. Add needed dependencies:** `pixi add python=3.9 appose==0.7.2`
-
-</v-click>
-<v-click>
-
-**2. Move packages from `pypi-dependencies` to `dependencies`**
-
-</v-click>
-<v-click>
-
-**3. Test it:** `pixi run python run.py`
-
-</v-click>
-<v-click>
-
-**Common issues to fix:**
-1. `opencv-python` fails → move back to `pypi-dependencies`
-2. Missing images → run `unzip UNSEG/image.zip`
-3. Qt errors → change `opencv-python` to `opencv-python-headless`
-
-</v-click>
-<v-click>
-
-**🎯 Checkpoint:** `git commit -a -m 'Update dependencies to first working version'`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 5: Adapt unseg.py for Appose
-
-Make the library "listenable" by adding a callback mechanism:
-
-<v-click>
-
-Add at the top of `unseg.py`:
-
-```python
-report = print
-def listen(callback):
-    global report
-    report = callback
-```
-
-</v-click>
-
-<v-click>
-
-Then replace all `print(` with `report(`.
-
-**🤔 Why?** Allows calling code to capture progress updates via callback
-
-</v-click>
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Change print statements to callback invocations' unseg.py`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 6: Append Running Code
-
-Paste the contents of `run.py` at the bottom of `unseg.py`:
-
-**Now we have a single file that:**
-- Defines the library functions
-- Includes example usage code
-- Can be called as a script
-
-<v-click>
-
-**💡 This makes it easy to test the code standalone before integrating with Appose**
-
-</v-click>
-
-<v-click>
-
-**Test it again:**
-```bash
-pixi run python unseg.py
-```
-
-</v-click>
-
-<v-click>
-
-**🎯 Checkpoint:** `git rm -f run.py && git commit -a -m 'Unify all code into one script'`
-
-</v-click>
+<!--
+TODO: Push a `2026` branch (or tags step2026-NN) to ctrueden/unseg-fiji with checkpoints.
+-->
 
 ---
 layout: two-cols
 ---
 
-# Step 7: Refactor Image Loading Logic
+# Step 1: The Environment
 
-* Simplify `open_img` to *only* open the image
-* Move intensity channel selection to main script
+Create `pixi.toml` next to `unseg.py`:
 
-**🤔 Why?** Prepares for images coming from Appose
+```toml
+[workspace]
+name = "unseg-fiji"
+channels = ["conda-forge"]
+platforms = ["linux-64", "linux-aarch64",
+             "osx-64", "osx-arm64", "win-64"]
 
-<v-click>
+[dependencies]
+python = "3.9.*"
+appose = ">=0.12"
+numpy = "==1.24.3"
+matplotlib = "==3.7.1"
+scikit-image = "==0.20.0"
+scikit-learn = "==1.2.2"
+scipy = "==1.9.1"
 
-**🎯 Checkpoint:**  
-```bash
-git commit \
-    -m 'Split out channel selection logic' \
-    unseg.py
+[pypi-dependencies]
+opencv-python-headless = "==4.7.0.72"
 ```
-
-</v-click>
 
 ::right::
 
-```python
-def open_img(path_to_img):
-    """Returns the RGB image (img)"""
-    return io.imread(path_to_img, plugin="tifffile")
+<div class="pl-8 pt-16">
 
-def plot_img(img, tlt='', cmp='gray'):
-    ...
+<v-click>
 
-# Path to image
-path_to_img = './image/Gallbladder_Normal_Tissue.tif'
+**Where did this come from?**
+- UNSEG's `requirements.txt`, via<br>`pixi import --format pypi-txt`
+- Plus `python=3.9` and `appose>=0.12`
+- `opencv-python` → `-headless` (no Qt)
 
-# Open and plot the original image
-img = open_img(path_to_img)
-plot_img(img, tlt='Image')
+</v-click>
 
-# Select intensity channels for processing: two channels
-# with nuclei (DAPI) and cell membrane (Na+K+ATPase) markers
-h = img.shape[0]
-w = img.shape[1]
-intensity = np.zeros((h,w,2), dtype='float64')
-intensity[:,:,0] = img[:,:,2] # Nuclei Marker
-intensity[:,:,1] = img[:,:,0] # Cell Membrane Marker
+<v-click>
+
+**Test it (optional):**
+
+```bash
+pixi run python -c "import unseg"
 ```
 
+</v-click>
+
+<v-click>
+
+💡 **No pixi?** No problem. Appose downloads its own. The command line is just for testing.
+
+</v-click>
+
+</div>
+
 ---
-layout: default
+layout: two-cols
 ---
 
-# Step 8: Add "Appose Mode" to Script
+# Step 2: Hello, Script!
 
-Add Appose task handling to beginning of the main section:
+In Fiji: *File › New › Script...*
+
+Paste, then save as `Segment_UNSEG.py` **in the project folder**:
 
 ```python
-appose_mode = 'task' in globals()
-if appose_mode:
-    listen(task.update)
-else:
-    from appose.python_worker import Task
-    task = Task()
+#!appose-python
+#@script(env="pixi.toml")
+
+#@ Img image
+
+print(f"shape={image.shape}, dtype={image.dtype}")
 ```
 
+Click **Run** ▶️
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- First run **builds the environment**: watch the status bar ⏳
+- Output appears in the Script Editor console
+- Run again: instant, env is reused
+
+</v-clicks>
+
 <v-click>
 
-**What this does:**
-- Checks if running in Appose context (task exists) or standalone
-- Connects our `listen` callback to Appose's `task.update` method
-- Creates a dummy task object when running outside Appose
+**🤔 What shape did you get?**
+
+```
+shape=(3, 1024, 1024), dtype=uint8
+```
+
+Channels first! NumPy axes are **reversed** from ImgLib2's (X, Y, C) → (C, Y, X)
 
 </v-click>
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Make script Appose-aware' unseg.py`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 9: Integrate with Appose
-
-Modify `unseg.py` to work in "Appose mode":
-
-<div class="grid grid-cols-2 gap-4">
-<div>
-
-1. **Get input image from task instead of file:**
-   ```python
-   if appose_mode:
-       image = task.inputs['image'].ndarray()
-   else:
-       image = open_img(path_to_img)
-   ```
-
-2. **Comment out plot calls** (or make conditional)
 
 </div>
-<div>
-<ol start="3"><li>
 
-**Set outputs:**
+<!--
+TODO: Verify actual shape/dtype printed for the sample image.
+-->
+
+---
+layout: two-cols
+---
+
+# Step 3: Call UNSEG
+
 ```python
-if appose_mode:
-    task.outputs['nuclei'] = mask_nuclei
-    task.outputs['cells'] = mask_cells
-```
+#!appose-python
+#@script(env="pixi.toml")
 
-</li></ol>
-</div>
-</div>
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Add case logic for appose mode' unseg.py`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 10: Create the Fiji Script
-
-Now the exciting part: call Python from Java! 🐍
-
-Launch Fiji &rarr; *File › New › Script...* &rarr; *Language › Groovy*
-
-<div class="grid grid-cols-2 gap-4">
-
-<div>
-
-<v-click>
-
-**🤔 Why Groovy?**
-- Full Java compatibility
-- Works seamlessly with Fiji
-- Simpler syntax than pure Java
-
-</v-click>
-
-</div>
-<div>
-
-<v-click>
-
-Declare inputs &amp; outputs as
-[SciJava script parameters](https://imagej.net/scripting/parameters):
-
-```groovy
 #@ Img image
 #@output Img nuclei
 #@output Img cells
 
-println(image)
+import numpy as np
+from unseg import nuclei_cell_segmentation
+
+# (C, Y, X) → two-channel (Y, X, 2) intensity
+intensity = np.stack(
+    [image[2],   # nuclei marker (DAPI)
+     image[0]],  # membrane marker (Na+K+ATPase)
+    axis=-1).astype("float64")
+
+nuclei, cells, n_nuclei, n_cells = \
+    nuclei_cell_segmentation(intensity)
+
+print(f"Found {n_nuclei} nuclei, {n_cells} cells")
 ```
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- `unseg.py` sits next to the script: just `import` it
+- Declared `#@output`s are read from the Python variables of the same names
+- NumPy arrays → Fiji images, via shared memory
+- UNSEG's own `print` progress messages stream to the console
+
+</v-clicks>
+
+<v-click>
+
+Run it! 🚀
 
 </v-click>
 
 </div>
-<v-click>
 
-Save the script as `Unseg_Fiji.groovy`
-
-</v-click>
-</div>
-
-<v-click>
-
-**🎯 Checkpoint:** `git add Unseg_Fiji.groovy && git commit -m 'Start writing the Groovy script'`
-
-</v-click>
+<!--
+TODO: Requires scripting-appose-python to put the script's directory on
+sys.path (not yet implemented as of 2026-09-24!). Otherwise, attendees need:
+  import sys; sys.path.insert(0, "/path/to/unseg-fiji")
+-->
 
 ---
-layout: default
+layout: two-cols
 ---
 
-# Step 11: Build Environment
-
-Embed the `pixi.toml` configuration:
-
-```groovy
-import org.apposed.appose.Appose
-
-println("== BUILDING ENVIRONMENT ==")
-pixiToml = """
-# ... paste entire pixi.toml contents here ...
-"""
-
-env = Appose.pixi().content(pixiToml).logDebug().build()
-println("Environment build complete: ${env.base()}")
-```
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Build the Appose environment' Unseg_Fiji.groovy`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 12: Read Python Script
-
-Load the adapted `unseg.py`:
-
-```groovy
-// Read in the Python script (TODO: load as resource instead of hardcoding path)
-unsegPath = System.getProperty("user.home") + "/Desktop/unseg-fiji/unseg.py"
-unsegScript = new File(unsegPath).text
-println("Loaded unseg script of length ${unsegScript.length()}")
-```
-
-<v-click>
-
-**💡 Later:** You could embed the Python code directly in the Groovy script, or package it as a resource
-
-</v-click>
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Load the unseg Python script' Unseg_Fiji.groovy`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 13: Add Shared Memory Utility Functions
-
-For copying an ImgLib2 `Img` to Appose `NDArray`:
-```groovy
-import net.imglib2.appose.ShmImg
-imgToAppose = { img ->
-    ndArray = ShmImg.copyOf(image).ndArray()
-    println("Copied image into shared memory: ${ndArray.shape()}")
-    return ndArray
-}
-```
-
-For wrapping an Appose `NDArray` as ImgLib2 `Img`:
-```groovy
-import net.imglib2.appose.NDArrays
-apposeToImg = { ndarray ->
-    NDArrays.asArrayImg(ndarray)
-}
-```
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Add NDArray utility functions' Unseg_Fiji.groovy`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 14: Execute Task 🚀
-
-Invoke the Python code via an Appose task:
-
-```groovy
-println("== STARTING PYTHON SERVICE ==")
-try (python = env.python()) {
-    inputs = ["ndarray": imgToAppose(image)]
-    task = python.task(unsegScript, inputs)
-        .listen { if (it.message) println("[UNSEG] ${it.message}") }
-        .waitFor()
-
-    println("TASK FINISHED: ${task.status}")
-    if (task.error) println(task.error)
-    nuclei = apposeToImg(task.outputs["nuclei"])
-    cells = apposeToImg(task.outputs["cells"])
-}
-finally {
-    println("== TERMINATING PYTHON SERVICE ==")
-}
-```
-
-<v-click>
-
-**🎯 Checkpoint:** `git commit -m 'Call unseg code via Appose' Unseg_Fiji.groovy`
-
-</v-click>
-
----
-layout: default
----
-
-# Step 15: Fix Bugs! 🪲
-
-```
-TASK FINISHED: FAILED
-Traceback (most recent call last):
-  File "/home/curtis/.local/share/appose/unseg-fiji/.pixi/envs/default/lib/python3.9/site-packages/appose/python_worker.py", line 145, in _run
-    exec(compile(block, "<string>", mode="exec"), _globals, binding)
-  File "<string>", line 1644, in <module>
-AttributeError: 'Task' object has no attribute 'inputs'
-```
-
-<div class="grid grid-cols-2 gap-4">
-
-<div>
-
-<v-click>
-
-**💡 HINTS:**
-
-<div style="font-size: small">
-
-- Task inputs are available as variables directly, not `task.inputs`
-- The Groovy script passes a var named `ndarray`, not `image`
-- Use `appose.NDArray.ndarray()` to obtain a `numpy.ndarray`
-- To transform input &amp; output images, these functions are needed ➡️
-
-</div>
-
-</v-click>
-
-</div>
-<div>
-
-<v-click>
+# Step 4: Expose the Parameters
 
 ```python
-def flip_img(img):
-    """Flips a NumPy array between Java (F_ORDER) and NumPy-friendly (C_ORDER)"""
-    return np.transpose(img, tuple(reversed(range(img.ndim))))
-
-def share_as_ndarray(img):
-    """Copies a NumPy array into a same-sized newly allocated block of shared memory"""
-    from appose import NDArray
-    shared = NDArray(str(img.dtype), img.shape)
-    shared.ndarray()[:] = img
-    return shared
+#@ Img image
+#@ Integer (value=2) nuclei_channel
+#@ Integer (value=0) membrane_channel
+#@ Integer (value=20) area_threshold
+#@ Integer (value=4) convexity_threshold
+#@ Integer (value=25) cell_marker_threshold
+#@ String (choices={"GDT", "DT"}) dist_tr
+#@ Double (value=0.5, min=0, max=1) t0
+#@output Img nuclei
+#@output Img cells
 ```
 
-</v-click>
+```python
+nuclei, cells, n_nuclei, n_cells = \
+    nuclei_cell_segmentation(
+        intensity,
+        area_threshold=area_threshold,
+        convexity_threshold=convexity_threshold,
+        cell_marker_threshold=cell_marker_threshold,
+        dist_tr=dist_tr,
+        t0=t0)
+```
 
-</div>
-</div>
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- Standard [SciJava script parameters](https://imagej.net/scripting/parameters)
+- Numbers, strings, booleans, lists → plain Python values
+- Fiji builds the dialog for you
+- Macro-recordable, headless-runnable, batch-able
+
+</v-clicks>
 
 <v-click>
 
-**🎯 Checkpoint:** `git commit -m 'Fix Appose-related bugs in Python code' unseg.py`
+**🎯 Try:** tweak `cell_marker_threshold` and rerun
 
 </v-click>
+
+</div>
+
+---
+layout: default
+---
+
+# Step 5: Make It a Menu Command
+
+Copy the project folder into Fiji's `scripts` directory:
+
+```
+Fiji.app/scripts/Plugins/UNSEG/
+├── Segment_UNSEG.py
+├── unseg.py
+└── pixi.toml
+```
+
+<v-clicks>
+
+- Restart Fiji → *Plugins › UNSEG › Segment UNSEG*
+- Also appears in the **search bar** 🔍
+- `pixi.toml` resolves relative to the script: it travels with it
+- Share it on an **update site**: users get the plugin, Appose builds the env
+
+</v-clicks>
+
+<v-click>
+
+<div class="pt-4">
+
+### That's it. 🎉 A Python-powered Fiji plugin with **zero Java**.
+
+</div>
+
+</v-click>
+
+<!--
+TODO: Test that `unseg.py` in scripts/Plugins/UNSEG/ does not itself get picked
+up as a menu command (lowercase, no underscore... SciJava registers all
+scripts in scripts/ — may need to move helper to a non-script location or
+rename; verify before workshop!).
+-->
+
+---
+layout: default
+---
+
+# Last Year vs. This Year
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+### I2K 2025: Groovy + Appose API
+
+1. Make `unseg.py` "listenable"
+2. Add "Appose mode" branches
+3. Read inputs from `task`, write `task.outputs`
+4. Flip/transposes for axis order
+5. Copy outputs into shared memory
+6. Embed `pixi.toml` in Groovy
+7. Build env, start service
+8. `Img` ↔ `NDArray` helpers
+9. Marshal 15 parameters by hand
+10. Run task, handle errors, clean up
+
+</div>
+<div>
+
+### I2K 2026: appose-python
+
+1. Write `pixi.toml`
+2. `#!appose-python` + `#@script(env=...)`
+3. Declare `#@` inputs and outputs
+4. `import unseg` and call it
+
+<v-click>
+
+<div class="pt-8">
+
+**~100 lines of Groovy + edits to UNSEG** →<br>**~25 lines of Python, UNSEG untouched**
+
+</div>
+
+</v-click>
+
+</div>
+</div>
 
 ---
 layout: default
@@ -1182,22 +1322,253 @@ layout: default
 
 # Troubleshooting Tips
 
-**Common issues:**
+<div class="text-sm">
 
 <v-clicks>
 
-- **Environment build fails** → Test build on command line; use `logDebug` function
-- **Service won't start** or **Tasks won't run** → Use `Service#debug` function
-- **Python script errors** → Test standalone first with `pixi run python unseg.py`
-- **Input/output types** → Verify Appose can serialize your data types
+- **Environment build fails** → Test on the command line: `pixi install`, `pixi run python -c "import unseg"`
+- **`ModuleNotFoundError: appose`** → The env needs the `appose` package (and `numpy` for images)
+- **Wrong language** → First line must be `#!appose-python`, or Fiji will use Jython
+- **Env file not found** → `env=` is relative to the *script's* location: save the script first!
+- **Script imports itself** → Don't name a script like a module it imports (`Unseg.py` vs. `unseg.py` on macOS/Windows!)
+- **Axes look wrong** → NumPy order is reversed from Fiji's: `(C, Y, X)`, not `(X, Y, C)`
+- **See what the worker is doing** → *Window › Console*, and set log level to debug
 
 </v-clicks>
+
 <v-click>
 
-**Debug strategy:**
-1. Test Python code standalone
-2. Test environment with simple script
-3. Add Appose integration incrementally
+**Debug strategy:** ① test Python standalone (`pixi run python ...`) → ② test the script with a trivial body (`print(image.shape)`) → ③ add the real work incrementally
+
+</v-click>
+
+</div>
+
+---
+layout: center
+class: text-center
+---
+
+# One More Step: scikit-ops
+
+What if the **same Python** ran in Fiji, *and* napari, *and* notebooks...?
+
+---
+layout: default
+---
+
+# From Script to Op
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+UNSEG is already a scikit-ops op:
+
+```python
+class Segmentation(NamedTuple):
+    nuclei: LabelsData
+    cells: LabelsData
+    n_nuclei: int
+    n_cells: int
+
+@op(env="unseg-cv")
+def unseg(
+    image: ImageData,
+    nuclei_channel: int = 2,
+    membrane_channel: int = 0,
+    area_threshold: int = 20,
+    dist_tr: DistanceTransform = GEODESIC,
+    ...
+) -> Segmentation:
+    """Segment nuclei and cells..."""
+    from ._algorithm import nuclei_cell_segmentation
+    ...
+```
+
+</div>
+<div>
+
+<v-click>
+
+**Compare with our script:**
+
+<div class="text-sm">
+
+| Script | Op |
+|---|---|
+| `#@script(env=...)` | `@op(env=...)` |
+| `#@ Integer (value=20) t` | `t: int = 20` |
+| `#@ String (choices=...)` | an `Enum` |
+| `#@output Img nuclei` | a `NamedTuple` field |
+| `print(...)` | `skop.progress(...)` |
+
+</div>
+
+</v-click>
+
+<v-click>
+
+Same idea, but it's **just a Python function**: testable, callable, no platform baked in.
+
+</v-click>
+
+</div>
+</div>
+
+---
+layout: default
+---
+
+# Demo: scikit-ops in napari 🏝️
+
+`skop-napari`: one **Ops** panel for *every* op skop can discover
+
+<div class="grid grid-cols-2 gap-8 pt-4">
+<div>
+
+<v-clicks>
+
+- Form generated from the op's signature
+- Image/labels parameters → layer pickers
+- Outputs → the right layer type, by role
+- Progress bar + Cancel button
+- Environment build progress, too
+- **Axis mapping**: run a 2D op slicewise on a 3D stack
+
+</v-clicks>
+
+</div>
+<div>
+
+<v-click>
+
+### The demo 🤯
+
+One 3D dataset, one napari:
+1. **StarDist 2D** slicewise (TensorFlow env)
+2. **Cellpose 3** slicewise (PyTorch env)
+3. **UNSEG** (Python 3.9 env)
+
+Three incompatible environments,<br>side by side, zero setup.
+
+</v-click>
+
+</div>
+</div>
+
+<!--
+TODO: Pre-build stardist-tf, cellpose3, unseg-cv envs on the demo machine.
+TODO: Pick the 3D dataset (skop.ops.generate:synthetic_nuclei? or a real one).
+-->
+
+---
+layout: default
+---
+
+# Try It Yourself
+
+```bash
+pip install skop-napari
+napari
+```
+
+*Plugins › scikit-ops › Ops*
+
+<v-click>
+
+### Or from plain Python
+
+```python
+import skop
+from skop.ops.segment import unseg
+
+with skop.Runner() as runner:
+    result = runner.run(unseg, image=my_array)
+
+print(result.n_nuclei, result.n_cells)
+```
+
+</v-click>
+
+<!--
+TODO: Requires scikit-ops 0.1.0 + skop-napari 0.1.0 on PyPI. If not released,
+make this slide "coming soon" and demo from a checkout.
+-->
+
+---
+layout: default
+---
+
+# And in Fiji: skop-fiji
+
+<div class="grid grid-cols-2 gap-8">
+<div>
+
+<v-clicks>
+
+- **One menu command per op**: *Plugins › scikit-ops › Segment › Unseg*
+- Found by the **search bar**
+- Dialog generated from the op's signature
+- Labels → `ImgLabeling`, boxes/masks → ROI Manager
+- Progress & Cancel in the status bar
+- Stable macro identifier: macro-recordable
+- **Shares environments with napari**: build once, use everywhere
+
+</v-clicks>
+
+</div>
+<div>
+
+<v-click>
+
+### Axis mapping, in one line
+
+```
+x y z! c
+```
+
+- `x`, `y` → fed to the op
+- `z!` → iterate: run slicewise
+- `z=27` → run at one position
+- `z+` → hand the whole axis to the op
+
+</v-click>
+
+</div>
+</div>
+
+<!--
+TODO: Depends on skop-fiji 0.1.0 + update site. If not ready, retitle
+"Coming soon: skop-fiji" and keep brief.
+TODO: Verify menu path for the unseg op.
+-->
+
+---
+layout: default
+---
+
+# Which Approach When?
+
+<div class="text-sm">
+
+| You want to... | Use |
+|---|---|
+| Script interactively against the ImageJ API, from Python | **Python mode** |
+| Mix Python and Java objects freely, zero-copy | **Python mode** |
+| Use a Python tool with its own (incompatible) environment, from Fiji | **appose-python script** |
+| Ship a Python-powered command to Fiji users, no Java | **appose-python script** |
+| Build a rich Java UI (TrackMate, Mastodon, SAMJ) around Python models | **Appose** (Java API) |
+| Write an algorithm once, for Fiji *and* napari *and* notebooks | **scikit-ops** |
+
+</div>
+
+<v-click>
+
+<div class="pt-6">
+
+They compose, too: an appose-python script, a Java plugin, and an op can all share the **same** Appose environments.
+
+</div>
 
 </v-click>
 
@@ -1207,26 +1578,26 @@ layout: default
 
 # Next Steps
 
-**After this workshop:**
+<div class="grid grid-cols-2 gap-8">
+<div>
 
-<v-clicks>
+**Learn more:**
+- Appose: https://apposed.org
+- appose-python scripts: https://github.com/scijava/scripting-appose-python
+- scikit-ops: https://github.com/apposed/scikit-ops
+- Python mode: https://imagej.net/scripting/python
+- Appose Playground: https://github.com/Image-Analysis-Hub
 
-- Explore Appose examples: https://github.com/apposed/appose
-- Try other Python libraries in Fiji
-- Integrate Appose into your own projects
-- Join the discussion: https://forum.image.sc (tag: appose)
+</div>
+<div>
+
+**Get involved:**
+- Forum: https://forum.image.sc (tags: `appose`, `fiji`, `python`)
+- Wrap your favorite Python tool as an appose-python script, or an op!
 - Contribute back! PRs welcome
 
-</v-clicks>
-<v-click>
-
-**Ideas for experimentation:**
-- Different deep learning models
-- R-based statistical analysis
-- Custom Python algorithms
-- Bidirectional workflows (Python calling Java)
-
-</v-click>
+</div>
+</div>
 
 ---
 layout: center
@@ -1238,7 +1609,7 @@ class: text-center
 Thank you for participating! 🙏
 
 <div class="pt-8">
-<div>Appose: https://github.com/apposed/appose</div>
+<div>Slides: https://fiji.github.io/i2k-2026-fiji-python/</div>
 <div>UNSEG Reference: https://github.com/ctrueden/unseg-fiji</div>
 <div>Forum: https://forum.image.sc</div>
 </div>
