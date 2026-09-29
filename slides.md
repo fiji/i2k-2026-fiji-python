@@ -217,11 +217,12 @@ layout: two-cols
 
 # ② Python Mode
 
-Real CPython *inside* Fiji's process
+Real CPython *inside* Fiji's process 🐍
 
 Powered by **PyImageJ**, **scyjava** (JPype), and **Jaunch**
 
-*Edit › Options › Python...* → choose an environment → restart
+*Edit › Options › Python...*  
+→ choose/build an environment → restart
 
 ```python
 #@ ImageJ ij
@@ -242,14 +243,15 @@ blurred = ij.py.to_dataset(gaussian(arr, sigma))
 <v-clicks>
 
 ### Pros ✅
-- **Same process**: Java and Python share memory directly
-- Java objects wrapped as Python objects: full ImageJ API from Python
+- **Same process**: Java and Python share memory
+- Full Fiji/ImageJ API from Python
 - Interactive, low latency, no serialization
 
 ### Cons ❌
 - **One environment** at a time, chosen by the user
-- Everything must coexist: Fiji's JVM + every Python library
+- All Python libraries must coexist in one env
 - A crash in native code takes down Fiji
+- macOS threading model restricts GUI scenarios
 
 </v-clicks>
 
