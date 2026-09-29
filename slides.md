@@ -40,7 +40,7 @@ AGENDA / TIMING (120 min):
 - 0:00–0:25  Five steps toward simplicity (talk)
 - 0:25–0:35  What's new in Appose
 - 0:35–0:50  Demos: Appose in the wild
-- 0:50–1:30  Hands-on: UNSEG as an appose-python script
+- 0:50–1:30  Hands-on: StarDist 2D (Cellcast) as an appose-python script
 - 1:30–1:52  One more step: scikit-ops
 - 1:52–2:00  Which approach when? + Q&A
 -->
@@ -132,34 +132,6 @@ class: text-center
 # Five Steps Toward Simplicity
 
 How do we get Python into Fiji, and make it *easy*?
-
----
-layout: default
----
-
-# The Staircase
-
-<div class="text-sm">
-
-| | Approach | You write | Environment | Processes | Platform |
-|---|---|---|---|---|---|
-| <v-click at="1">**1**</v-click> | <v-click at="1">Call Python via `ProcessBuilder`</v-click> | <v-click at="1">Java + Python + glue</v-click> | <v-click at="1">*You* install it</v-click> | <v-click at="1">Two, via files</v-click> | <v-click at="1">Fiji</v-click> |
-| <v-click at="2">**2**</v-click> | <v-click at="2">**Python mode** (PyImageJ)</v-click> | <v-click at="2">Python script</v-click> | <v-click at="2">*You* pick one</v-click> | <v-click at="2">**One**, shared memory</v-click> | <v-click at="2">Fiji</v-click> |
-| <v-click at="3">**3**</v-click> | <v-click at="3">**Appose**-powered plugins</v-click> | <v-click at="3">Java + Python</v-click> | <v-click at="3">Built on demand</v-click> | <v-click at="3">Many, shared memory</v-click> | <v-click at="3">Fiji</v-click> |
-| <v-click at="4">**4**</v-click> | <v-click at="4">**appose-python** scripts</v-click> | <v-click at="4">Python script</v-click> | <v-click at="4">Built on demand</v-click> | <v-click at="4">Many, shared memory</v-click> | <v-click at="4">Fiji</v-click> |
-| <v-click at="5">**5**</v-click> | <v-click at="5">**scikit-ops**</v-click> | <v-click at="5">A Python *function*</v-click> | <v-click at="5">Built on demand</v-click> | <v-click at="5">Many, shared memory</v-click> | <v-click at="5">**Any**</v-click> |
-
-</div>
-
-<v-click at="6">
-
-<div class="pt-4">
-
-Each step asks **less** of the author, and **nothing** of the user. 🎯
-
-</div>
-
-</v-click>
 
 ---
 layout: two-cols
@@ -467,17 +439,13 @@ Since the Pasteur hackathon (Mar 2026), we're pulling the shared plumbing out of
 
 - `imglib2-appose`: Img ↔ NDArray
 - Common environment building & progress UI
-- **appose-swing** *(coming soon)*: see what Appose is doing under the hood
+- **appose-swing** *(coming soon)*: graphical environment manager
 
 **But what if there were *no* Java at all?** 🤔
 
 </div>
 
 </v-click>
-
-<!--
-TODO: Update the appose-swing line depending on release status before the workshop.
--->
 
 ---
 layout: two-cols
@@ -784,41 +752,6 @@ model.call("eval");
 </div>
 
 ---
-layout: default
----
-
-# Coming Soon: appose-swing 👀
-
-Visual feedback for what Appose is doing under the hood
-
-<div class="grid grid-cols-2 gap-8 pt-4">
-<div>
-
-- Which environments exist, and their build status
-- Which workers are running, and their tasks
-- Live build & task progress
-- Reusable across Appose-based Fiji plugins
-
-</div>
-<div>
-
-<!-- TODO: screenshot of appose-swing -->
-
-<div class="p-8 rounded text-center opacity-50" style="border: 2px dashed currentColor">
-
-*screenshot / live demo*
-
-</div>
-
-</div>
-</div>
-
-<!--
-TODO: Update or drop this slide depending on appose-swing release status.
-Feature bullets are placeholders; replace with what actually ships.
--->
-
----
 layout: center
 class: text-center
 ---
@@ -925,14 +858,14 @@ class: text-center
 
 # 👩‍💻 Hands-On 👨‍💻
 
-**UNSEG in Fiji, the 2026 way**
+**StarDist in Fiji, the 2026 way**
 
 <div class="pt-4">
-Goal: Integrate UNSEG with Fiji as an appose-python script
+Goal: Build a StarDist 2D Fiji command, from scratch, as an appose-python script
 </div>
 
 <div class="pt-8 text-sm opacity-75">
-⏱️ ~40 minutes
+⏱️ ~30 minutes
 </div>
 
 ---
@@ -946,16 +879,16 @@ layout: default
 
 ## What we'll build
 
-A Fiji command that runs **UNSEG** nucleus + cell segmentation
-
-**UNSEG:** Unsupervised segmentation of cells and their nuclei in tissue  
-https://github.com/uttamLab/UNSEG
+A Fiji command that runs **StarDist 2D** nucleus segmentation, powered by **Cellcast**
 
 <v-click>
 
-## Last year vs. this year
+**Cellcast:** a *recast* of cell segmentation models  
+by Ed Evans @ LOCI · https://github.com/uw-loci/cellcast
 
-Same algorithm, same result:<br>**15 steps** of Python + Groovy + Appose API<br>→ **6 steps**, pure Python
+- Written in **Rust**, on the Burn deep learning framework
+- **WebGPU** backend: any GPU (Metal, Vulkan, DirectX), or CPU
+- `pip install cellcast`: needs only **NumPy**
 
 </v-click>
 
@@ -964,11 +897,21 @@ Same algorithm, same result:<br>**15 steps** of Python + Groovy + Appose API<br>
 
 <v-click>
 
-## Why UNSEG?
+## Why Cellcast?
 
-- Pure CPU: no GPU, no multi-GB PyTorch download over conference Wi-Fi
-- *Very* particular environment: Python 3.9, numpy 1.24.3, scikit-image 0.20.0...
-- ...which would **never** coexist with a modern Fiji Python mode env
+- No TensorFlow, no CUDA: no multi-GB download over conference Wi-Fi
+- GPU-accelerated on *your* laptop, whatever its GPU
+- Pretrained *versatile fluo* weights: no training needed
+
+</v-click>
+
+<v-click>
+
+<div class="pt-4 text-sm">
+
+**Last year** we did UNSEG, via Groovy + the Appose API ([slides](https://fiji.github.io/i2k-2025-appose/), [code](https://github.com/ctrueden/unseg-fiji)).<br>**This year:** pure Python. No Java, no Groovy.
+
+</div>
 
 </v-click>
 
@@ -981,38 +924,30 @@ layout: default
 
 # Step 0: Set Up
 
-Create a project folder and get UNSEG:
+Create an empty project folder:
 
 ```bash
-mkdir ~/Desktop/unseg-fiji
-cd ~/Desktop/unseg-fiji
-git clone https://github.com/uttamLab/UNSEG
-cp UNSEG/unseg.py .
-unzip UNSEG/image.zip
+mkdir ~/Desktop/stardist-fiji
+cd ~/Desktop/stardist-fiji
 ```
 
 <v-click>
 
-**What's in here?**
-- `unseg.py` - The segmentation algorithm (a library of functions)
-- `image/Gallbladder_Normal_Tissue.tif` - Sample image data
+That's it. No cloning, no downloads (yet). We'll build everything **from scratch**. 🏗️
 
 </v-click>
 
 <v-click>
 
-Open the sample image in Fiji: *File › Open...*
-
-</v-click>
-
-<v-click>
-
-💡 Stuck at any point? Reference solution: https://github.com/ctrueden/unseg-fiji (branch `2026`)
+**You'll need:**
+- **Fiji**, fully updated (*Help › Update...*)
+- **pixi**, for testing on the command line: https://pixi.sh
 
 </v-click>
 
 <!--
-TODO: Push a `2026` branch (or tags step2026-NN) to ctrueden/unseg-fiji with checkpoints.
+TODO: Push a reference solution with per-step checkpoints (e.g. ctrueden/stardist-fiji,
+tags step-01 ... step-09) and add a "Stuck?" link to this slide.
 -->
 
 ---
@@ -1021,54 +956,57 @@ layout: two-cols
 
 # Step 1: The Environment
 
-Create `pixi.toml` next to `unseg.py`:
+Build a pixi environment, one command at a time:
+
+```bash
+pixi init
+pixi add python=3.12 appose
+pixi add --pypi cellcast
+```
+
+<v-click>
+
+Result: `pixi.toml`
 
 ```toml
 [workspace]
-name = "unseg-fiji"
 channels = ["conda-forge"]
-platforms = ["linux-64", "linux-aarch64",
-             "osx-64", "osx-arm64", "win-64"]
+name = "stardist-fiji"
+platforms = ["osx-arm64"]
+version = "0.1.0"
 
 [dependencies]
-python = "3.9.*"
-appose = ">=0.12"
-numpy = "==1.24.3"
-matplotlib = "==3.7.1"
-scikit-image = "==0.20.0"
-scikit-learn = "==1.2.2"
-scipy = "==1.9.1"
+python = "3.12.*"
+appose = ">=0.12.0,<0.13"
 
 [pypi-dependencies]
-opencv-python-headless = "==4.7.0.72"
+cellcast = ">=0.3.0, <0.4"
 ```
+
+</v-click>
 
 ::right::
 
 <div class="pl-8 pt-16">
 
+<v-clicks>
+
+- `appose` comes from **conda-forge**: the worker needs it to talk to Fiji
+- `cellcast` is only on **PyPI**: hence `--pypi`
+- PyPI packages need a Python first: add `python` *before* `cellcast`
+- NumPy? Comes along with `cellcast`
+
+</v-clicks>
+
 <v-click>
 
-**Where did this come from?**
-- UNSEG's `requirements.txt`, via<br>`pixi import --format pypi-txt`
-- Plus `python=3.9` and `appose>=0.12`
-- `opencv-python` → `-headless` (no Qt)
-
-</v-click>
-
-<v-click>
-
-**Test it (optional):**
+💡 `pixi init` lists only **your** platform. To share the env with others:
 
 ```bash
-pixi run python -c "import unseg"
+pixi workspace platform add \
+  linux-64 linux-aarch64 \
+  osx-64 osx-arm64 win-64
 ```
-
-</v-click>
-
-<v-click>
-
-💡 **No pixi?** No problem. Appose downloads its own. The command line is just for testing.
 
 </v-click>
 
@@ -1078,22 +1016,139 @@ pixi run python -c "import unseg"
 layout: two-cols
 ---
 
-# Step 2: Hello, Script!
+# Step 2: Quick Test in Python REPL
+
+Before touching Fiji, make sure it works:
+
+```python
+$ pixi run python
+>>> import cellcast
+>>> model = cellcast.models.StarDist2D.init_fluo(gpu=True)
+>>> help(model.predict_fluo)
+```
+
+<v-click>
+
+Segment a fake image with two square "nuclei":
+
+```python
+>>> import numpy
+>>> image = numpy.zeros((256, 256), dtype=numpy.uint16)
+>>> image[50:90, 50:90] = 1000
+>>> image[150:200, 140:180] = 1000
+>>> labels = model.predict_fluo(image)
+>>> labels.max()
+np.uint64(2)
+```
+
+</v-click>
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- First `init_fluo` **downloads** the pretrained weights, then caches them
+- `gpu=True` → WebGPU; `gpu=False` → CPU
+- `help()` shows the knobs: `pmin`, `pmax`, `prob_threshold`, `nms_threshold`
+- Output: a **label image**, one integer per nucleus
+- Note the dtype: `uint64` 👀 (remember this for later)
+
+</v-clicks>
+
+<v-click>
+
+🎯 **Debug strategy:** always get it working in plain Python *first*. Then move to Fiji.
+
+</v-click>
+
+</div>
+
+---
+layout: two-cols
+---
+
+# Step 3: Acquire Sample Data
+
+Download scikit-image's `cells3d` dataset:
+
+```bash
+curl -LO https://gitlab.com/scikit-image/data/-/raw/\
+2cdc5ce89b334d28f06a58c9f0ca21aa6992a5ba/cells3d.tif
+```
+
+<div class="text-sm opacity-75">
+
+Windows PowerShell: `curl.exe` (not `curl`), all on one line
+
+</div>
+
+<v-click>
+
+Or skip the terminal: in Fiji, *File › Import › URL...*
+
+</v-click>
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-click>
+
+Open `cells3d.tif` in Fiji:
+- 256×256 pixels, **60** Z slices, **2** channels, 16-bit
+- C1 = membranes, C2 = **nuclei** 🎯
+- Courtesy of the Allen Institute for Cell Science
+
+</v-click>
+
+<v-click>
+
+Keep just the nuclei:
+1. *Image › Color › Split Channels*
+2. Close `C1-cells3d.tif`
+
+</v-click>
+
+<v-click>
+
+And make a 2D test image:
+
+3. On `C2-cells3d.tif`, go to slice 30
+4. *Image › Duplicate...*, **uncheck** *Duplicate stack*
+
+</v-click>
+
+</div>
+
+<!--
+Alternative, if the URL is ever dead: `pixi add scikit-image pooch`, then
+skimage.data.cells3d() and tifffile.imwrite(..., imagej=True). The URL is the
+one pinned in skimage/data/_registry.py.
+-->
+
+---
+layout: two-cols
+---
+
+# Step 4: Hello, Script!
 
 In Fiji: *File › New › Script...*
 
-Paste, then save as `Segment_UNSEG.py` **in the project folder**:
+Paste or type the following:
 
 ```python
-#!appose-python
-#@script(env="pixi.toml")
+#@script(language="appose-python", env="pixi.toml")
 
 #@ Img image
 
 print(f"shape={image.shape}, dtype={image.dtype}")
 ```
 
-Click **Run** ▶️
+**Save it** to your project folder as `Cellcast_via_Appose.py`.
+
+Select the `C2-cells3d.tif` window, then click **Run** ▶️
 
 ::right::
 
@@ -1102,6 +1157,7 @@ Click **Run** ▶️
 <v-clicks>
 
 - First run **builds the environment**: watch the status bar ⏳
+- Same `pixi.toml` we tested from the command line
 - Output appears in the Script Editor console
 - Run again: instant, env is reused
 
@@ -1112,47 +1168,40 @@ Click **Run** ▶️
 **🤔 What shape did you get?**
 
 ```
-shape=(3, 1024, 1024), dtype=uint8
+shape=(60, 256, 256), dtype=uint16
 ```
 
-Channels first! NumPy axes are **reversed** from ImgLib2's (X, Y, C) → (C, Y, X)
+Z first! NumPy axes are **reversed** from ImgLib2's: (X, Y, Z) → (Z, Y, X)
 
 </v-click>
 
 </div>
 
 <!--
-TODO: Verify actual shape/dtype printed for the sample image.
+TODO: Verify actual shape/dtype printed for C2-cells3d.tif.
 -->
 
 ---
 layout: two-cols
 ---
 
-# Step 3: Call UNSEG
+# Step 5: Segment!
 
-```python
-#!appose-python
-#@script(env="pixi.toml")
+Add an output, and the same two lines we ran in the REPL:
+
+```python {4,6-9}
+#@script(language="appose-python", env="pixi.toml")
 
 #@ Img image
-#@output Img nuclei
-#@output Img cells
+#@output Img labels
 
-import numpy as np
-from unseg import nuclei_cell_segmentation
+import cellcast
 
-# (C, Y, X) → two-channel (Y, X, 2) intensity
-intensity = np.stack(
-    [image[2],   # nuclei marker (DAPI)
-     image[0]],  # membrane marker (Na+K+ATPase)
-    axis=-1).astype("float64")
-
-nuclei, cells, n_nuclei, n_cells = \
-    nuclei_cell_segmentation(intensity)
-
-print(f"Found {n_nuclei} nuclei, {n_cells} cells")
+model = cellcast.models.StarDist2D.init_fluo(gpu=True)
+labels = model.predict_fluo(image).astype("uint16")
 ```
+
+Select the **2D slice** window, then **Run** ▶️
 
 ::right::
 
@@ -1160,55 +1209,50 @@ print(f"Found {n_nuclei} nuclei, {n_cells} cells")
 
 <v-clicks>
 
-- `unseg.py` sits next to the script: just `import` it
-- Declared `#@output`s are read from the Python variables of the same names
-- NumPy arrays → Fiji images, via shared memory
-- UNSEG's own `print` progress messages stream to the console
+- `#@output Img labels` → the `labels` variable comes back as a new image
+- `.astype("uint16")`: remember that `uint64`? Fiji prefers 16-bit labels
+- *Image › Lookup Tables › glasbey_on_dark* to see the nuclei 🌈
+- Weights are cached: no download this time
 
 </v-clicks>
 
 <v-click>
 
-Run it! 🚀
+🎉 **StarDist in Fiji.** Nine lines, zero Java.
 
 </v-click>
 
 </div>
 
 <!--
-TODO: Requires scripting-appose-python to put the script's directory on
-sys.path (not yet implemented as of 2026-09-24!). Otherwise, attendees need:
-  import sys; sys.path.insert(0, "/path/to/unseg-fiji")
+TODO: Verify how the output image is displayed (window title, calibration).
 -->
 
 ---
 layout: two-cols
 ---
 
-# Step 4: Expose the Parameters
+# Step 6: Expose the Parameters
 
 ```python
 #@ Img image
-#@ Integer (value=2) nuclei_channel
-#@ Integer (value=0) membrane_channel
-#@ Integer (value=20) area_threshold
-#@ Integer (value=4) convexity_threshold
-#@ Integer (value=25) cell_marker_threshold
-#@ String (choices={"GDT", "DT"}) dist_tr
-#@ Double (value=0.5, min=0, max=1) t0
-#@output Img nuclei
-#@output Img cells
+#@ Double (value=1.0) pmin
+#@ Double (value=99.8) pmax
+#@ Double (value=0.479, min=0, max=1) prob_threshold
+#@ Double (value=0.3, min=0, max=1) nms_threshold
+#@ Boolean (value=true) gpu
+#@output Img labels
 ```
 
 ```python
-nuclei, cells, n_nuclei, n_cells = \
-    nuclei_cell_segmentation(
-        intensity,
-        area_threshold=area_threshold,
-        convexity_threshold=convexity_threshold,
-        cell_marker_threshold=cell_marker_threshold,
-        dist_tr=dist_tr,
-        t0=t0)
+model = cellcast.models.StarDist2D.init_fluo(gpu=gpu)
+labels = model.predict_fluo(
+    data=image,
+    pmin=pmin,
+    pmax=pmax,
+    prob_threshold=prob_threshold,
+    nms_threshold=nms_threshold,
+).astype("uint16")
 ```
 
 ::right::
@@ -1218,40 +1262,160 @@ nuclei, cells, n_nuclei, n_cells = \
 <v-clicks>
 
 - Standard [SciJava script parameters](https://imagej.net/scripting/parameters)
-- Numbers, strings, booleans, lists → plain Python values
+- Where did the defaults come from? `help(model.predict_fluo)` 📖
+- Numbers, strings, booleans → plain Python values
 - Fiji builds the dialog for you
+- Add `description="..."` for tooltips
 - Macro-recordable, headless-runnable, batch-able
 
 </v-clicks>
 
 <v-click>
 
-**🎯 Try:** tweak `cell_marker_threshold` and rerun
+**🎯 Try:** lower `prob_threshold` → more nuclei; raise `nms_threshold` → more overlap allowed
 
 </v-click>
 
 </div>
 
 ---
+layout: two-cols
+---
+
+# Step 7: Go 3D
+
+Now select `C2-cells3d.tif` (the whole stack) and **Run** ▶️
+
+<v-click>
+
+```
+TypeError: Unsupported array dtype, supported array
+dtypes are u8, u16, u64, f32, and f64.
+```
+
+🤨 But it *is* `uint16`! The real problem: StarDist**2D** wants a **2D** array.
+
+</v-click>
+
+<v-click>
+
+**Fix:** segment slice by slice.
+
+</v-click>
+
+::right::
+
+<v-click>
+
+<div class="pl-4">
+
+```python {all|4-11|12-13|14-20|21-22}
+import numpy
+
+model = cellcast.models.StarDist2D.init_fluo(gpu=gpu)
+def stardist2d(plane):
+    return model.predict_fluo(
+        data=plane,
+        pmin=pmin,
+        pmax=pmax,
+        prob_threshold=prob_threshold,
+        nms_threshold=nms_threshold,
+    ).astype("uint16")
+if image.ndim == 2:
+    labels = stardist2d(image)
+elif image.ndim == 3:
+    slice_count = image.shape[0]
+    label_slices = []
+    for i in range(slice_count):
+        task.update(f"Slice {i + 1} of {slice_count}",
+                    current=i, maximum=slice_count)
+        label_slices.append(stardist2d(image[i]))
+    labels = numpy.stack(label_slices)
+else:
+    raise ValueError(f"Bad shape: {image.shape}")
+```
+
+</div>
+
+</v-click>
+
+<!--
+- `task` is always available: task.update(...) → progress in Fiji's status bar.
+- Init the model ONCE, outside the loop (the template re-inits per slice).
+- Label IDs restart at 1 on each slice: not linked across Z. Bonus challenge:
+  cellcast also has cellcast.models.StarDist3D!
+- task.cancel_requested → honor the Cancel button inside the loop (bonus).
+-->
+
+---
+layout: two-cols
+---
+
+# Step 8: One File to Rule Them All
+
+Move the environment **into the script** with a [PEP 723](https://packaging.python.org/en/latest/specifications/inline-script-metadata/) block, then delete `pixi.toml`:
+
+```python {1-9}
+#@script(language="appose-python")
+
+# /// script
+# requires-python = ">=3.12,<3.13"
+# dependencies = [
+#   "cellcast>=0.3.0,<0.4",
+#   "appose>=0.12.0,<0.13",
+# ]
+# ///
+
+#@ Img image
+#@output Img labels
+...
+```
+
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-clicks>
+
+- No more `env=`: the script *is* the environment declaration
+- `dependencies` come from **PyPI**, so `appose` does too
+- Need conda packages? `[tool.pixi.dependencies]` works too
+- Platforms: automatic, whatever the script runs on
+- Same standard as `uv run` and `pixi run --script`
+
+</v-clicks>
+
+<v-click>
+
+**Why bother?** One file is **much** easier to share. 📦
+
+</v-click>
+
+</div>
+
+<!--
+Workflow tip: keep pixi.toml while developing (easy REPL testing with
+`pixi run python`), then go inline once it works.
+-->
+
+---
 layout: default
 ---
 
-# Step 5: Make It a Menu Command
+# Step 9: Make It a Menu Command
 
-Copy the project folder into Fiji's `scripts` directory:
+Copy the script into Fiji's `scripts` directory:
 
 ```
-Fiji.app/scripts/Plugins/UNSEG/
-├── Segment_UNSEG.py
-├── unseg.py
-└── pixi.toml
+Fiji.app/scripts/Plugins/StarDist/
+└── Cellcast_via_Appose.py
 ```
 
 <v-clicks>
 
-- Restart Fiji → *Plugins › UNSEG › Segment UNSEG*
+- Restart Fiji → *Plugins › StarDist › Cellcast via Appose*
 - Also appears in the **search bar** 🔍
-- `pixi.toml` resolves relative to the script: it travels with it
+- One file, environment included: nothing else to copy
 - Share it on an **update site**: users get the plugin, Appose builds the env
 
 </v-clicks>
@@ -1260,63 +1424,69 @@ Fiji.app/scripts/Plugins/UNSEG/
 
 <div class="pt-4">
 
-### That's it. 🎉 A Python-powered Fiji plugin with **zero Java**.
+### That's it. 🎉 A GPU-accelerated deep learning Fiji plugin with **zero Java**.
 
 </div>
 
 </v-click>
 
-<!--
-TODO: Test that `unseg.py` in scripts/Plugins/UNSEG/ does not itself get picked
-up as a menu command (lowercase, no underscore... SciJava registers all
-scripts in scripts/ — may need to move helper to a non-script location or
-rename; verify before workshop!).
--->
-
 ---
-layout: default
+layout: two-cols
 ---
 
-# Last Year vs. This Year
+# Recap: What We Built
 
-<div class="grid grid-cols-2 gap-8">
-<div>
+<div class="text-sm">
 
-### I2K 2025: Groovy + Appose API
-
-1. Make `unseg.py` "listenable"
-2. Add "Appose mode" branches
-3. Read inputs from `task`, write `task.outputs`
-4. Flip/transposes for axis order
-5. Copy outputs into shared memory
-6. Embed `pixi.toml` in Groovy
-7. Build env, start service
-8. `Img` ↔ `NDArray` helpers
-9. Marshal 15 parameters by hand
-10. Run task, handle errors, clean up
+1. `pixi init` + `pixi add`: an environment
+2. `pixi run python`: test Cellcast standalone
+3. `curl`: sample data
+4. `#@script` + `#@ Img`: hello, Fiji
+5. `predict_fluo`: segment one slice
+6. `#@` parameters: a dialog for free
+7. A `for` loop: handle 3D stacks
+8. `/// script`: one self-contained file
+9. `scripts/Plugins/`: a menu command
 
 </div>
-<div>
-
-### I2K 2026: appose-python
-
-1. Write `pixi.toml`
-2. `#!appose-python` + `#@script(env=...)`
-3. Declare `#@` inputs and outputs
-4. `import unseg` and call it
 
 <v-click>
 
-<div class="pt-8">
+<div class="pt-4">
 
-**~100 lines of Groovy + edits to UNSEG** →<br>**~25 lines of Python, UNSEG untouched**
+Compare I2K 2025: **~100 lines of Groovy** + edits to UNSEG's own code
 
 </div>
 
 </v-click>
 
+::right::
+
+<div class="pl-8 pt-16">
+
+<v-click>
+
+### Psst... 🤫
+
+It ships with Fiji now, as a **script template**:
+
+*File › New › Script...*  
+*Templates › Appose › StarDist cellcast*
+
+</v-click>
+
+<v-click>
+
+Nearly identical to what you just wrote. Compare! 🔍
+
+</v-click>
+
 </div>
-</div>
+
+<!--
+TODO: Verify the template's menu path in the Script Editor once
+scripting-appose-python 0.1.0 is on the update site.
+-->
 
 ---
 layout: default
@@ -1328,19 +1498,21 @@ layout: default
 
 <v-clicks>
 
-- **Environment build fails** → Test on the command line: `pixi install`, `pixi run python -c "import unseg"`
+- **Environment build fails** → Test on the command line: `pixi install`, then `pixi run python -c "import cellcast"`
 - **`ModuleNotFoundError: appose`** → The env needs the `appose` package (and `numpy` for images)
-- **Wrong language** → First line must be `#!appose-python`, or Fiji will use Jython
+- **`pixi add cellcast` finds nothing** → It's on PyPI, not conda-forge: `pixi add --pypi cellcast`
+- **Wrong language** → First line must be `#@script(language="appose-python", ...)` or `#!appose-python`, or Fiji will use Jython
 - **Env file not found** → `env=` is relative to the *script's* location: save the script first!
-- **Script imports itself** → Don't name a script like a module it imports (`Unseg.py` vs. `unseg.py` on macOS/Windows!)
-- **Axes look wrong** → NumPy order is reversed from Fiji's: `(C, Y, X)`, not `(X, Y, C)`
+- **`Unsupported array dtype`** on a stack → StarDist2D wants 2D: loop over slices (Step 7)
+- **Labels look black** → Apply a LUT (*glasbey_on_dark*), or *Image › Adjust › Brightness/Contrast*
+- **Axes look wrong** → NumPy order is reversed from Fiji's: `(Z, Y, X)`, not `(X, Y, Z)`
 - **See what the worker is doing** → *Window › Console*, and set log level to debug
 
 </v-clicks>
 
 <v-click>
 
-**Debug strategy:** ① test Python standalone (`pixi run python ...`) → ② test the script with a trivial body (`print(image.shape)`) → ③ add the real work incrementally
+**Debug strategy:** ① test Python standalone (`pixi run python`) → ② test the script with a trivial body (`print(image.shape)`) → ③ add the real work incrementally
 
 </v-click>
 
@@ -1364,26 +1536,18 @@ layout: default
 <div class="grid grid-cols-2 gap-8">
 <div>
 
-UNSEG is already a scikit-ops op:
+StarDist 2D is already a scikit-ops op:
 
 ```python
-class Segmentation(NamedTuple):
-    nuclei: LabelsData
-    cells: LabelsData
-    n_nuclei: int
-    n_cells: int
-
-@op(env="unseg-cv")
-def unseg(
-    image: ImageData,
-    nuclei_channel: int = 2,
-    membrane_channel: int = 0,
-    area_threshold: int = 20,
-    dist_tr: DistanceTransform = GEODESIC,
-    ...
-) -> Segmentation:
-    """Segment nuclei and cells..."""
-    from ._algorithm import nuclei_cell_segmentation
+@op(env="stardist-tf")
+def stardist2d_fluo(
+    image: Annotated[ImageData, Axes("y", "x", "c?")],
+    prob_thresh: float = 0.5,
+    nms_thresh: float = 0.4,
+    normalize: bool = True,
+) -> LabelsData:
+    """Detect objects in a fluorescence image
+    with pretrained StarDist."""
     ...
 ```
 
@@ -1399,10 +1563,10 @@ def unseg(
 | Script | Op |
 |---|---|
 | `#@script(env=...)` | `@op(env=...)` |
-| `#@ Integer (value=20) t` | `t: int = 20` |
-| `#@ String (choices=...)` | an `Enum` |
-| `#@output Img nuclei` | a `NamedTuple` field |
-| `print(...)` | `skop.progress(...)` |
+| `#@ Double (value=0.3) t` | `t: float = 0.3` |
+| `#@output Img labels` | `-> LabelsData` |
+| our `for` loop | axis mapping |
+| `task.update(...)` | `skop.progress(...)` |
 
 </div>
 
@@ -1416,6 +1580,13 @@ Same idea, but it's **just a Python function**: testable, callable, no platform 
 
 </div>
 </div>
+
+<!--
+Remember our 3D loop? The op declares 2D, and the front end does the looping.
+
+Note: skop's stardist2d ops use the original TensorFlow StarDist (stardist-tf env),
+not Cellcast. (Signature abridged: the real one has slider widget hints.)
+-->
 
 ---
 layout: default
@@ -1612,6 +1783,6 @@ Thank you for participating! 🙏
 
 <div class="pt-8">
 <div>Slides: https://fiji.github.io/i2k-2026-fiji-python/</div>
-<div>UNSEG Reference: https://github.com/ctrueden/unseg-fiji</div>
+<div>Cellcast: https://github.com/uw-loci/cellcast</div>
 <div>Forum: https://forum.image.sc</div>
 </div>
