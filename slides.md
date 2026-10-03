@@ -35,16 +35,6 @@ I2K×BINA 2026
 
 </div>
 
-<!--
-AGENDA / TIMING (120 min):
-- 0:00–0:25  Five steps toward simplicity (talk)
-- 0:25–0:35  What's new in Appose
-- 0:35–0:50  Demos: Appose in the wild
-- 0:50–1:30  Hands-on: StarDist 2D (Cellcast) as an appose-python script
-- 1:30–1:52  One more step: scikit-ops
-- 1:52–2:00  Which approach when? + Q&A
--->
-
 ---
 layout: default
 ---
@@ -56,12 +46,12 @@ layout: default
 
 | | |
 |---|---|
-| **0:00** | Five steps toward simplicity |
-| **0:25** | What's new in Appose |
-| **0:35** | Demos: Appose in the wild |
-| **0:50** | 👩‍💻 Hands-on: a Python-powered Fiji script |
-| **1:30** | One more step: scikit-ops |
-| **1:52** | Which approach when? Q&A |
+| **0:00** | 🪜 Five steps toward simplicity |
+| **0:30** | ✨ What's new in Appose |
+| **0:45** | 📺 Demos: Appose in the wild |
+| **1:00** | 👩‍💻 Hands-on: a Python-powered Fiji script |
+| **1:40** | 🐾 One more step: scikit-ops |
+| **1:50** | ⁉️ Which approach when? Q&A |
 
 </div>
 <div>
@@ -72,7 +62,6 @@ layout: default
 - Fiji **Latest** (not Stable) from https://fiji.sc/
 - *Help › Update...* until fully up to date
 - [pixi](https://pixi.sh/latest/installation/) (recommended)
-- git (recommended)
 
 **Can follow along without coding&mdash;just watch!**
 
